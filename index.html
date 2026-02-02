@@ -17,7 +17,6 @@
 
         /* --- 🐰 CUSTOM BUNNY CURSOR --- */
         body, button, a {
-            /* This creates an SVG cursor on the fly */
             cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'  width='40' height='48' viewport='0 0 100 100' style='fill:black;font-size:24px;'><text y='50%'>🐰</text></svg>") 16 0, auto !important;
         }
 
@@ -28,7 +27,7 @@
             background-image: radial-gradient(#ffb3c1 0.5px, transparent 0.5px), radial-gradient(#ffb3c1 0.5px, var(--bg) 0.5px);
             background-size: 20px 20px;
             font-family: 'Quicksand', sans-serif;
-            overflow-x: hidden; /* Prevents scrollbars if button moves to edge */
+            overflow-x: hidden;
             color: #590d22;
         }
 
@@ -60,6 +59,7 @@
             transform-origin: center;
             filter: drop-shadow(0px 10px 10px rgba(0,0,0,0.2));
             transition: transform 0.1s linear;
+            display: none; /* Hidden until scroll */
         }
 
         /* --- Header --- */
@@ -135,7 +135,6 @@
             color: var(--primary);
         }
 
-        /* Tape Logic */
         .tape {
             width: 120px;
             height: 35px;
@@ -178,7 +177,6 @@
             color: var(--primary);
         }
 
-        /* Flexbox ensures buttons sit side-by-side initially */
         .btn-group {
             margin-top: 40px;
             display: flex; 
@@ -193,18 +191,17 @@
             font-size: 1.2rem;
             border: none;
             border-radius: 50px;
-            cursor: pointer; /* Will rely on body cursor, but keeping good practice */
+            cursor: pointer;
             font-family: 'Quicksand', sans-serif;
             font-weight: 700;
             transition: transform 0.2s;
-            z-index: 50; /* High z-index */
+            z-index: 50; 
         }
 
         #yesBtn {
             background: var(--primary);
             color: white;
             box-shadow: 0 10px 20px rgba(255, 77, 109, 0.3);
-            /* Ultra High Z-index ensures Yes is always on top */
             z-index: 100; 
             position: relative;
         }
@@ -217,7 +214,7 @@
         #noBtn {
             background: #e9ecef;
             color: #495057;
-            position: relative; /* Starts relative to sit nicely */
+            position: relative; 
         }
 
         /* --- Success Screen --- */
@@ -246,9 +243,6 @@
             box-shadow: 0 20px 50px rgba(0,0,0,0.1);
             max-width: 400px;
         }
-
-        .ticket h1 { font-size: 3rem; margin-bottom: 10px; }
-        .ticket p { font-size: 1.2rem; color: #555; }
         
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
@@ -299,8 +293,20 @@
     </div>
 
     <script>
-        // --- CONFIGURATION ---
-        const photoCount = 10; 
+        // --- YOUR PHOTOS (Hosted Links) ---
+        const imageUrls = [
+            "https://res.cloudinary.com/dowhvdkjh/image/upload/v1770032330/photo1_h1u2st.jpg",
+            "https://res.cloudinary.com/dowhvdkjh/image/upload/v1770032286/photo2_dwqt56.jpg",
+            "https://res.cloudinary.com/dowhvdkjh/image/upload/v1770032287/photo3_q8mbq9.jpg",
+            "https://res.cloudinary.com/dowhvdkjh/image/upload/v1770032421/photo4_fybb5r.jpg",
+            "https://res.cloudinary.com/dowhvdkjh/image/upload/v1770032289/photo5_r9lrar.jpg",
+            "https://res.cloudinary.com/dowhvdkjh/image/upload/v1770032287/photo6_ik6sz7.jpg",
+            "https://res.cloudinary.com/dowhvdkjh/image/upload/v1770032289/photo7_xvwm0c.jpg",
+            "https://res.cloudinary.com/dowhvdkjh/image/upload/v1770032292/photo8_exuedc.jpg",
+            "https://res.cloudinary.com/dowhvdkjh/image/upload/v1770032290/photo9_iw1hxv.jpg",
+            "https://res.cloudinary.com/dowhvdkjh/image/upload/v1770032294/photo10_bpf8gy.png"
+        ];
+
         const timeline = document.getElementById('timeline');
         const plane = document.getElementById('plane');
         const pathElement = document.getElementById('journey-path');
@@ -308,10 +314,10 @@
         // --- 1. SETUP PHOTOS & TIMELINE ---
         function setupTimeline() {
             const spacing = 450; 
+            timeline.style.height = (imageUrls.length * spacing) + 'px'; 
             
-            timeline.style.height = (photoCount * spacing) + 'px'; 
-            
-            for(let i=1; i<=photoCount; i++) {
+            imageUrls.forEach((url, index) => {
+                const i = index + 1;
                 const card = document.createElement('div');
                 card.className = 'memory-card';
                 
@@ -326,12 +332,12 @@
                 
                 card.innerHTML = `
                     <div class="tape"></div>
-                    <img src="photo${i}.jpg" alt="Memory ${i}" onerror="this.src='https://placehold.co/300x400?text=Us'">
+                    <img src="${url}" alt="Memory ${i}">
                     <div class="caption-bar">Memory #${i}</div>
                 `;
                 
                 timeline.appendChild(card);
-            }
+            });
         }
         setupTimeline();
 
@@ -347,17 +353,15 @@
             let d = `M ${center} 0 `; 
             pathPoints = []; 
             
-            const steps = 100; 
+            const steps = 150; 
             const stepY = docHeight / steps;
             
             for (let i = 0; i <= steps; i++) {
                 const y = i * stepY;
                 const x = center + Math.sin(y * 0.003) * waveWidth;
-                
                 d += `L ${x} ${y} `;
                 pathPoints.push({x, y});
             }
-            
             pathElement.setAttribute('d', d);
         }
         
@@ -378,7 +382,6 @@
             
             if (currentPoint && nextPoint) {
                 const screenY = currentPoint.y - scrollY;
-                
                 if (screenY > -50 && screenY < window.innerHeight + 50) {
                     plane.style.display = 'block';
                     plane.style.left = currentPoint.x + 'px';
@@ -395,12 +398,12 @@
             }
         });
 
-        // --- 4. SMART & BOUNDED NO BUTTON ---
+        // --- 4. SMART NO BUTTON ---
         function dodge() {
             const noBtn = document.getElementById('noBtn');
             const yesBtn = document.getElementById('yesBtn');
             
-            // On first hover, switch to fixed positioning so it can fly anywhere
+            // On first interaction, switch to fixed positioning
             if (window.getComputedStyle(noBtn).position !== 'fixed') {
                 const rect = noBtn.getBoundingClientRect();
                 noBtn.style.position = 'fixed';
@@ -411,7 +414,7 @@
             const yesRect = yesBtn.getBoundingClientRect();
             const noRect = noBtn.getBoundingClientRect();
             
-            // Screen Boundaries (with 20px padding)
+            // Boundaries (Stay on screen)
             const minX = 20;
             const maxX = window.innerWidth - noRect.width - 20;
             const minY = 20;
@@ -421,40 +424,31 @@
             let isSafe = false;
             let attempts = 0;
             
-            // Loop until we find a safe spot
+            // Loop to find safe spot away from Yes button
             while (!isSafe && attempts < 50) {
                 attempts++;
-                
-                // Generate random position inside SCREEN bounds
                 newX = Math.random() * (maxX - minX) + minX;
                 newY = Math.random() * (maxY - minY) + minY;
                 
-                // Check if this new position overlaps with YES button (with 20px buffer)
-                // We define a "forbidden zone" around the Yes button
-                const buffer = 30;
-                
-                // Conditions for overlapping
+                // Forbidden zone around YES button
+                const buffer = 50;
                 const overlapX = (newX < yesRect.right + buffer) && (newX + noRect.width > yesRect.left - buffer);
                 const overlapY = (newY < yesRect.bottom + buffer) && (newY + noRect.height > yesRect.top - buffer);
 
                 if (!overlapX || !overlapY) {
-                    // Safe! It doesn't overlap both X and Y
                     isSafe = true;
                 }
             }
             
-            // Apply new position
             noBtn.style.left = newX + 'px';
             noBtn.style.top = newY + 'px';
             
-            // Fun texts
             const texts = ["Missed me!", "Too slow!", "Nope!", "Try again!", "Can't catch me!"];
             noBtn.innerText = texts[Math.floor(Math.random() * texts.length)];
         }
 
         // --- 5. SUCCESS ---
         function accept() {
-            // Confetti
             for(let i=0; i<50; i++) {
                 const heart = document.createElement('div');
                 heart.innerHTML = '❤️';
@@ -466,13 +460,9 @@
                 heart.style.zIndex = 1000;
                 document.body.appendChild(heart);
             }
-            
-            // Show Ticket
-            const success = document.getElementById('success');
-            success.style.display = 'flex';
+            document.getElementById('success').style.display = 'flex';
         }
         
-        // CSS for falling hearts
         const style = document.createElement('style');
         style.innerHTML = `@keyframes fall { to { transform: translateY(110vh); } }`;
         document.head.appendChild(style);
