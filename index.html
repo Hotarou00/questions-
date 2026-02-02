@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Our Story ❤️</title>
+    <title>Kittu & Bunny's Story ❤️</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Quicksand:wght@300;600&display=swap" rel="stylesheet">
     <style>
@@ -59,7 +59,7 @@
             transform-origin: center;
             filter: drop-shadow(0px 10px 10px rgba(0,0,0,0.2));
             transition: transform 0.1s linear;
-            display: none; /* Hidden until scroll */
+            display: none; 
         }
 
         /* --- Header --- */
@@ -92,7 +92,7 @@
             display: inline-block;
         }
 
-        /* --- Timeline (The Scroll Area) --- */
+        /* --- Timeline --- */
         #timeline {
             position: relative;
             padding-bottom: 200px;
@@ -215,6 +215,8 @@
             background: #e9ecef;
             color: #495057;
             position: relative; 
+            /* Smooth transition only for initial appearance, removed for dodging */
+            transition: transform 0.2s;
         }
 
         /* --- Success Screen --- */
@@ -293,7 +295,7 @@
     </div>
 
     <script>
-        // --- YOUR PHOTOS (Hosted Links) ---
+        // --- CONFIGURATION ---
         const imageUrls = [
             "https://res.cloudinary.com/dowhvdkjh/image/upload/v1770032330/photo1_h1u2st.jpg",
             "https://res.cloudinary.com/dowhvdkjh/image/upload/v1770032286/photo2_dwqt56.jpg",
@@ -341,9 +343,8 @@
         }
         setupTimeline();
 
-        // --- 2. GENERATE SMOOTH PATH (SINE WAVE) ---
+        // --- 2. GENERATE SMOOTH PATH ---
         let pathPoints = [];
-        
         function generatePath() {
             const width = window.innerWidth;
             const docHeight = document.documentElement.scrollHeight;
@@ -364,11 +365,10 @@
             }
             pathElement.setAttribute('d', d);
         }
-        
         generatePath();
         window.addEventListener('resize', generatePath);
 
-        // --- 3. ANIMATE PLANE ON SCROLL ---
+        // --- 3. ANIMATE PLANE ---
         window.addEventListener('scroll', () => {
             const scrollY = window.scrollY;
             const docHeight = document.documentElement.scrollHeight - window.innerHeight;
@@ -386,11 +386,9 @@
                     plane.style.display = 'block';
                     plane.style.left = currentPoint.x + 'px';
                     plane.style.top = screenY + 'px';
-                    
                     const dx = nextPoint.x - currentPoint.x;
                     const dy = nextPoint.y - currentPoint.y;
                     const angle = Math.atan2(dy, dx) * (180 / Math.PI);
-                    
                     plane.style.transform = `translate(-50%, -50%) rotate(${angle + 45}deg)`;
                 } else {
                     plane.style.display = 'none';
@@ -398,48 +396,62 @@
             }
         });
 
-        // --- 4. SMART NO BUTTON ---
+        // --- 4. FIXED "NO" BUTTON LOGIC ---
         function dodge() {
             const noBtn = document.getElementById('noBtn');
             const yesBtn = document.getElementById('yesBtn');
             
-            // On first interaction, switch to fixed positioning
-            if (window.getComputedStyle(noBtn).position !== 'fixed') {
-                const rect = noBtn.getBoundingClientRect();
+            // IMPORTANT FIX: 
+            // Check if the button is still inside the card. If so, move it to the BODY.
+            // This prevents it from disappearing behind the glass effect or getting lost in relative positioning.
+            if (noBtn.parentNode !== document.body) {
+                const rect = noBtn.getBoundingClientRect(); // Get exact current screen position
+                
+                // Detach from card
+                noBtn.parentNode.removeChild(noBtn);
+                
+                // Attach to body
+                document.body.appendChild(noBtn);
+                
+                // Force fixed positioning relative to WINDOW
                 noBtn.style.position = 'fixed';
                 noBtn.style.left = rect.left + 'px';
                 noBtn.style.top = rect.top + 'px';
+                noBtn.style.zIndex = "9999"; // Ensure it's on top of EVERYTHING
             }
 
-            const yesRect = yesBtn.getBoundingClientRect();
-            const noRect = noBtn.getBoundingClientRect();
-            
-            // Boundaries (Stay on screen)
-            const minX = 20;
-            const maxX = window.innerWidth - noRect.width - 20;
-            const minY = 20;
-            const maxY = window.innerHeight - noRect.height - 20;
+            // Screen Boundaries
+            const pad = 20;
+            const maxX = window.innerWidth - noBtn.offsetWidth - pad;
+            const maxY = window.innerHeight - noBtn.offsetHeight - pad;
+            const minX = pad;
+            const minY = pad;
 
-            let newX, newY;
+            let newX = minX, newY = minY;
             let isSafe = false;
             let attempts = 0;
             
-            // Loop to find safe spot away from Yes button
+            // Get YES button position to avoid it
+            const yesRect = yesBtn.getBoundingClientRect();
+            
             while (!isSafe && attempts < 50) {
                 attempts++;
+                
+                // Random coordinates
                 newX = Math.random() * (maxX - minX) + minX;
                 newY = Math.random() * (maxY - minY) + minY;
                 
-                // Forbidden zone around YES button
+                // Check if overlapping with YES button (add 50px buffer)
                 const buffer = 50;
-                const overlapX = (newX < yesRect.right + buffer) && (newX + noRect.width > yesRect.left - buffer);
-                const overlapY = (newY < yesRect.bottom + buffer) && (newY + noRect.height > yesRect.top - buffer);
+                const overlapX = (newX < yesRect.right + buffer) && (newX + noBtn.offsetWidth > yesRect.left - buffer);
+                const overlapY = (newY < yesRect.bottom + buffer) && (newY + noBtn.offsetHeight > yesRect.top - buffer);
 
                 if (!overlapX || !overlapY) {
                     isSafe = true;
                 }
             }
             
+            // Apply new coordinates
             noBtn.style.left = newX + 'px';
             noBtn.style.top = newY + 'px';
             
