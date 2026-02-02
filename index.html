@@ -293,19 +293,51 @@
         </div>
     </div>
 
-    <script>
+<script>
         // --- CONFIGURATION ---
-        const imageUrls = [
-            "https://res.cloudinary.com/dowhvdkjh/image/upload/v1770032330/photo1_h1u2st.jpg",
-            "https://res.cloudinary.com/dowhvdkjh/image/upload/v1770032286/photo2_dwqt56.jpg",
-            "https://res.cloudinary.com/dowhvdkjh/image/upload/v1770032287/photo3_q8mbq9.jpg",
-            "https://res.cloudinary.com/dowhvdkjh/image/upload/v1770032421/photo4_fybb5r.jpg",
-            "https://res.cloudinary.com/dowhvdkjh/image/upload/v1770032289/photo5_r9lrar.jpg",
-            "https://res.cloudinary.com/dowhvdkjh/image/upload/v1770032287/photo6_ik6sz7.jpg",
-            "https://res.cloudinary.com/dowhvdkjh/image/upload/v1770032289/photo7_xvwm0c.jpg",
-            "https://res.cloudinary.com/dowhvdkjh/image/upload/v1770032292/photo8_exuedc.jpg",
-            "https://res.cloudinary.com/dowhvdkjh/image/upload/v1770032290/photo9_iw1hxv.jpg",
-            "https://res.cloudinary.com/dowhvdkjh/image/upload/v1770032294/photo10_bpf8gy.png"
+        // I changed this from a simple list to a list of "Objects" 
+        // allowing you to pair a specific text with a specific photo.
+        const memories = [
+            { 
+                url: "https://res.cloudinary.com/dowhvdkjh/image/upload/v1770032330/photo1_h1u2st.jpg", 
+                caption: "Kittu & Bunny ❤️" 
+            },
+            { 
+                url: "https://res.cloudinary.com/dowhvdkjh/image/upload/v1770032286/photo2_dwqt56.jpg", 
+                caption: "Chinese Kittu" 
+            },
+            { 
+                url: "https://res.cloudinary.com/dowhvdkjh/image/upload/v1770032287/photo3_q8mbq9.jpg", 
+                caption: "Bday Cake 😋" 
+            },
+            { 
+                url: "https://res.cloudinary.com/dowhvdkjh/image/upload/v1770032421/photo4_fybb5r.jpg", 
+                caption: "Beach Day 🌊" 
+            },
+            { 
+                url: "https://res.cloudinary.com/dowhvdkjh/image/upload/v1770032289/photo5_r9lrar.jpg", 
+                caption: "😂" 
+            },
+            { 
+                url: "https://res.cloudinary.com/dowhvdkjh/image/upload/v1770032287/photo6_ik6sz7.jpg", 
+                caption: "Pookie 😁" 
+            },
+            { 
+                url: "https://res.cloudinary.com/dowhvdkjh/image/upload/v1770032289/photo7_xvwm0c.jpg", 
+                caption: "Cute Kittu 💗" 
+            },
+            { 
+                url: "https://res.cloudinary.com/dowhvdkjh/image/upload/v1770032292/photo8_exuedc.jpg", 
+                caption: "Desi Kittu 😤" 
+            },
+            { 
+                url: "https://res.cloudinary.com/dowhvdkjh/image/upload/v1770032290/photo9_iw1hxv.jpg", 
+                caption: "Hot kittu 🔥" 
+            },
+            { 
+                url: "https://res.cloudinary.com/dowhvdkjh/image/upload/v1770032294/photo10_bpf8gy.png", 
+                caption: "I Love You Kittu ❤️‍🔥" 
+            }
         ];
 
         const timeline = document.getElementById('timeline');
@@ -315,9 +347,10 @@
         // --- 1. SETUP PHOTOS & TIMELINE ---
         function setupTimeline() {
             const spacing = 450; 
-            timeline.style.height = (imageUrls.length * spacing) + 'px'; 
+            timeline.style.height = (memories.length * spacing) + 'px'; 
             
-            imageUrls.forEach((url, index) => {
+            // We loop through the 'memories' list now
+            memories.forEach((memory, index) => {
                 const i = index + 1;
                 const card = document.createElement('div');
                 card.className = 'memory-card';
@@ -333,8 +366,8 @@
                 
                 card.innerHTML = `
                     <div class="tape"></div>
-                    <img src="${url}" alt="Memory ${i}">
-                    <div class="caption-bar">Memory #${i}</div>
+                    <img src="${memory.url}" alt="${memory.caption}">
+                    <div class="caption-bar">${memory.caption}</div>
                 `;
                 
                 timeline.appendChild(card);
@@ -471,3 +504,4 @@
     </script>
 </body>
 </html>
+
